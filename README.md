@@ -105,6 +105,33 @@ plt.ylabel('Cost (MSE/2)')
 plt.title('Cost Function Convergence')
 plt.grid(True)
 plt.show()
+ Create new sample (same feature names as original)
+new_sample = pd.DataFrame([{
+    'R&D Spend': 165349.2,
+    'Administration': 136897.8,
+    'Marketing Spend': 471784.1,
+    'State': 'New York'
+}])
+# Apply one-hot encoding
+new_encoded = pd.get_dummies(new_sample, columns=['State'], drop_first=True)
+
+# Align columns with training data (add missing ones as 0)
+new_encoded = new_encoded.reindex(columns=data_encoded.drop('Profit', axis=1).columns, fill_value=0)
+
+# Scale new data
+new_scaled = X_scaler.transform(new_encoded)
+
+# Add bias
+new_design = np.hstack((np.ones((new_scaled.shape[0], 1)), new_scaled))
+
+# Predict (scaled)
+scaled_pred = new_design.dot(theta)
+
+# Inverse transform to original units
+pred_original = y_scaler.inverse_transform(scaled_pred)
+
+print(f"\nPredicted Profit for the new startup: ₹{pred_original[0][0]:,.2f}")
+
 */
 ```
 
